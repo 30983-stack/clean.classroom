@@ -1740,4 +1740,1226 @@ return;
 
 }
 
-const
+let confirmDeduct =
+confirm(
+"นักเรียนคนนี้ไม่ทำเวร\n\n"+
+"ระบบจะหักคะแนน 1 คะแนนอัตโนมัติ\n"+
+"ยืนยันหรือไม่?"
+);
+
+if(!confirmDeduct){
+
+return;
+
+}
+
+try{
+
+await runTransaction(
+db,
+async transaction=>{
+
+const dutyRef=
+doc(db,"duties",id);
+
+const studentRef=
+doc(
+db,
+"students",
+String(duty.studentId)
+);
+
+const dutySnap=
+await transaction.get(dutyRef);
+
+const studentSnap=
+await transaction.get(studentRef);
+
+if(!dutySnap.exists()){
+
+throw new Error(
+"ไม่พบข้อมูลเวร"
+);
+
+}
+
+if(!studentSnap.exists()){
+
+throw new Error(
+"ไม่พบข้อมูลนักเรียน"
+);
+
+}
+
+const dutyData=
+dutySnap.data();
+
+const studentData=
+studentSnap.data();
+
+if(dutyData.status!=="waiting"){
+
+throw new Error(
+"เวรนี้ถูกตรวจไปแล้ว"
+);
+
+}
+
+if(dutyData.approved){
+
+throw new Error(
+"เวรนี้ได้รับการอนุมัติแล้ว"
+);
+
+}
+
+if(dutyData.scoreDeducted===true){
+
+throw new Error(
+"เวรนี้ถูกหักคะแนนไปแล้ว"
+);
+
+}
+
+const oldScore=
+typeof studentData.score==="number"
+?studentData.score
+:100;
+
+const newScore=
+Math.max(
+0,
+oldScore-1
+);
+
+transaction.update(
+studentRef,
+{
+score:newScore
+}
+);
+
+transaction.update(
+dutyRef,
+{
+status:"notdone",
+approved:true,
+scoreDeducted:true,
+checkedBy:currentUser.name,
+checkedAt:new Date().toISOString()
+}
+);
+
+}
+
+);
+
+await addDoc(
+collection(db,"history"),
+{
+time:new Date().toISOString(),
+
+message:
+`✗ ${duty.studentName} ไม่ทำเวรวันที่ ${duty.dutyDate} หักคะแนน 1 คะแนน โดย ${currentUser.name}`,
+
+type:"notdone",
+
+studentId:duty.studentId,
+
+dutyId:id
+}
+);
+
+alert(
+"บันทึกเรียบร้อย\n\n"+
+"❌ ไม่ทำเวร\n"+
+"⭐ หักคะแนน 1 คะแนน"
+);
+
+}catch(error){
+
+console.error(error);
+
+alert(
+"บันทึกไม่สำเร็จ\n\n"+
+error.message
+);
+
+}
+
+}
+
+
+/* ================= SEND LEAVE ================= */
+
+async function sendLeave(id){
+
+const duty=
+duties.find(
+d=>d.id===id
+);
+
+if(!duty){
+
+alert("ไม่พบข้อมูลเวร");
+
+return;
+
+}
+
+if(
+String(duty.studentId)!==
+String(currentUser.id)
+){
+
+alert(
+"ไม่ใช่เวรของคุณ"
+);
+
+return;
+
+}
+
+if(duty.status!=="waiting"){
+
+alert(
+"เวรนี้ไม่สามารถขอหยุดได้"
+);
+
+return;
+
+}
+
+const reason=
+prompt(
+"กรุณาระบุเหตุผลที่ขอหยุดเวร"
+);
+
+if(!reason||!reason.trim()){
+
+alert(
+"กรุณาระบุเหตุผล"
+);
+
+return;
+
+}
+
+try{
+
+await addDoc(
+collection(db,"requests"),
+{
+dutyId:id,
+
+studentId:duty.studentId,
+
+studentName:duty.studentName,
+
+dutyDate:duty.dutyDate,
+
+reason:reason.trim(),
+
+status:"waiting",
+
+createdAt:new Date().toISOString()
+}
+);
+
+alert(
+"ส่งคำขอหยุดเวรแล้ว\n"+
+"กรุณารอหัวหน้าเวรหรือครูอนุมัติ"
+);
+
+}catch(error){
+
+console.error(error);
+
+alert(
+"ส่งคำขอไม่สำเร็จ\n\n"+
+error.message
+);
+
+}
+
+}
+
+
+/* ================= REQUEST ================= */
+
+async function handleRequest(
+requestId,
+action
+){
+
+const request=
+requests.find(
+r=>r.id===requestId
+);
+
+if(!request){
+
+alert(
+"ไม่พบคำขอ"
+);
+
+return;
+
+}
+
+if(
+request.status!=="waiting"
+){
+
+alert(
+"คำขอนี้ถูกจัดการแล้ว"
+);
+
+return;
+
+}
+
+try{
+
+const duty=
+duties.find(
+d=>d.id===request.dutyId
+);
+
+if(action==="approve"){
+
+await updateDoc(
+doc(
+db,
+"requests",
+requestId
+),
+{
+status:"approved",
+
+approvedBy:currentUser.name,
+
+approvedAt:new Date().toISOString()
+}
+);
+
+if(duty){
+
+await updateDoc(
+doc(
+db,
+"duties",
+request.dutyId
+),
+{
+status:"leave",
+
+reason:request.reason,
+
+approved:true,
+
+approvedBy:currentUser.name,
+
+approvedAt:new Date().toISOString()
+}
+);
+
+}
+
+await addDoc(
+collection(db,"history"),
+{
+time:new Date().toISOString(),
+
+message:
+`📝 อนุมัติการหยุดเวรของ ${request.studentName} วันที่ ${request.dutyDate} โดย ${currentUser.name}`,
+
+type:"leave-approved",
+
+studentId:request.studentId,
+
+dutyId:request.dutyId
+}
+);
+
+alert(
+"อนุมัติการหยุดเวรแล้ว\n"+
+"จะไม่มีการหักคะแนน"
+);
+
+}
+
+
+if(action==="reject"){
+
+await updateDoc(
+doc(
+db,
+"requests",
+requestId
+),
+{
+status:"rejected",
+
+rejectedBy:currentUser.name,
+
+rejectedAt:new Date().toISOString()
+}
+);
+
+await addDoc(
+collection(db,"history"),
+{
+time:new Date().toISOString(),
+
+message:
+`❌ ปฏิเสธคำขอหยุดเวรของ ${request.studentName} วันที่ ${request.dutyDate} โดย ${currentUser.name}`,
+
+type:"leave-rejected",
+
+studentId:request.studentId,
+
+dutyId:request.dutyId
+}
+);
+
+alert(
+"ปฏิเสธคำขอแล้ว"
+);
+
+}
+
+}catch(error){
+
+console.error(error);
+
+alert(
+"ดำเนินการไม่สำเร็จ\n\n"+
+error.message
+);
+
+}
+
+}
+
+
+/* ================= RENDER ALL ================= */
+
+function renderAll(){
+
+renderDashboard();
+
+renderDuty();
+
+renderLeaderboard();
+
+renderRequests();
+
+renderStudents();
+
+renderHistory();
+
+}
+
+
+/* ================= DASHBOARD ================= */
+
+function renderDashboard(){
+
+const total=
+duties.length;
+
+const done=
+duties.filter(
+d=>d.status==="done"
+).length;
+
+const notdone=
+duties.filter(
+d=>d.status==="notdone"
+).length;
+
+const waiting=
+duties.filter(
+d=>d.status==="waiting"
+).length;
+
+const cards=
+document.getElementById(
+"dashboardCards"
+);
+
+if(cards){
+
+cards.innerHTML=`
+
+<div class="card">
+
+<div class="card-icon">
+📅
+</div>
+
+<div class="card-title">
+เวรทั้งหมด
+</div>
+
+<div class="card-value">
+${total}
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-icon">
+✓
+</div>
+
+<div class="card-title">
+ทำแล้ว
+</div>
+
+<div class="card-value">
+${done}
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-icon">
+✗
+</div>
+
+<div class="card-title">
+ไม่ทำ
+</div>
+
+<div class="card-value">
+${notdone}
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-icon">
+⏳
+</div>
+
+<div class="card-title">
+รอตรวจ
+</div>
+
+<div class="card-value">
+${waiting}
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* TODAY */
+
+const today=
+new Date()
+.toISOString()
+.split("T")[0];
+
+const todayList=
+duties.filter(
+d=>d.dutyDate===today
+);
+
+const todayBox=
+document.getElementById(
+"todayDuty"
+);
+
+if(!todayBox){
+
+return;
+
+}
+
+if(todayList.length===0){
+
+todayBox.innerHTML=
+`<div class="empty">
+วันนี้ไม่มีเวร
+</div>`;
+
+return;
+
+}
+
+todayBox.innerHTML=
+todayList.map(
+d=>`
+
+<div style="
+padding:14px;
+border-bottom:1px solid #e2e8f0;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+">
+
+<div>
+
+<b>
+${d.studentName}
+</b>
+
+<div style="
+color:#64748b;
+font-size:13px;
+margin-top:4px;
+">
+
+รหัส ${d.studentId}
+
+</div>
+
+</div>
+
+<div>
+
+${statusText(d.status)}
+
+</div>
+
+</div>
+
+`
+).join("");
+
+}
+
+
+/* ================= DUTY ================= */
+
+function renderDuty(){
+
+const table=
+document.getElementById(
+"dutyTable"
+);
+
+if(!table){
+
+return;
+
+}
+
+if(duties.length===0){
+
+table.innerHTML=
+`
+<tr>
+<td colspan="5">
+<div class="empty">
+ยังไม่มีข้อมูลเวร
+</div>
+</td>
+</tr>
+`;
+
+return;
+
+}
+
+const sorted=
+[...duties]
+.sort(
+(a,b)=>
+String(a.dutyDate)
+.localeCompare(
+String(b.dutyDate)
+)
+);
+
+table.innerHTML=
+sorted.map(
+d=>`
+
+<tr>
+
+<td>
+${d.dutyDate}
+</td>
+
+<td>
+
+<b>
+${d.studentName}
+</b>
+
+<br>
+
+<small>
+${d.studentId}
+</small>
+
+</td>
+
+<td>
+${statusText(d.status)}
+</td>
+
+<td>
+${d.reason||"-"}
+</td>
+
+<td>
+${actionButtons(d)}
+</td>
+
+</tr>
+
+`
+).join("");
+
+}
+
+
+/* ================= LEADERBOARD ================= */
+
+function renderLeaderboard(){
+
+const box=
+document.getElementById(
+"leaderboardList"
+);
+
+if(!box){
+
+return;
+
+}
+
+if(students.length===0){
+
+box.innerHTML=
+`
+<div class="empty">
+ยังไม่มีข้อมูลนักเรียน
+</div>
+`;
+
+return;
+
+}
+
+const ranking=
+[...students]
+.sort(
+(a,b)=>{
+
+const scoreA=
+typeof a.score==="number"
+?a.score
+:100;
+
+const scoreB=
+typeof b.score==="number"
+?b.score
+:100;
+
+if(scoreB!==scoreA){
+
+return scoreB-scoreA;
+
+}
+
+const doneA=
+duties.filter(
+d=>
+String(d.studentId)===
+String(a.id) &&
+d.status==="done"
+).length;
+
+const doneB=
+duties.filter(
+d=>
+String(d.studentId)===
+String(b.id) &&
+d.status==="done"
+).length;
+
+return doneB-doneA;
+
+}
+);
+
+box.innerHTML=
+ranking.map(
+(s,index)=>{
+
+const score=
+typeof s.score==="number"
+?s.score
+:100;
+
+const doneCount=
+duties.filter(
+d=>
+String(d.studentId)===
+String(s.id) &&
+d.status==="done"
+).length;
+
+const notDoneCount=
+duties.filter(
+d=>
+String(d.studentId)===
+String(s.id) &&
+d.status==="notdone"
+).length;
+
+let rankIcon=
+index+1;
+
+if(index===0){
+
+rankIcon="🥇";
+
+}
+
+if(index===1){
+
+rankIcon="🥈";
+
+}
+
+if(index===2){
+
+rankIcon="🥉";
+
+}
+
+return `
+
+<div class="rank-item">
+
+<div class="rank-number">
+${rankIcon}
+</div>
+
+<div class="rank-info">
+
+<div class="rank-name">
+${s.name}
+</div>
+
+<div class="rank-detail">
+
+รหัส ${s.id}
+·
+ทำเวร ${doneCount} ครั้ง
+·
+ไม่ทำ ${notDoneCount} ครั้ง
+
+</div>
+
+</div>
+
+<div class="rank-score">
+
+⭐ ${score}
+
+</div>
+
+</div>
+
+`;
+
+}
+).join("");
+
+}
+
+
+/* ================= REQUEST TABLE ================= */
+
+function renderRequests(){
+
+const table=
+document.getElementById(
+"requestTable"
+);
+
+if(!table){
+
+return;
+
+}
+
+let list=
+[...requests];
+
+if(currentRole==="student"){
+
+list=
+list.filter(
+r=>
+String(r.studentId)===
+String(currentUser?.id)
+);
+
+}
+
+if(list.length===0){
+
+table.innerHTML=
+`
+<tr>
+
+<td colspan="5">
+
+<div class="empty">
+ไม่มีคำขอหยุดเวร
+</div>
+
+</td>
+
+</tr>
+`;
+
+return;
+
+}
+
+table.innerHTML=
+list
+.sort(
+(a,b)=>
+String(b.createdAt)
+.localeCompare(
+String(a.createdAt)
+)
+)
+.map(
+r=>{
+
+let status="⏳ รอตรวจ";
+
+if(r.status==="approved"){
+
+status=
+`<span class="status status-leave">
+✓ อนุมัติแล้ว
+</span>`;
+
+}
+
+if(r.status==="rejected"){
+
+status=
+`<span class="status status-notdone">
+✗ ปฏิเสธ
+</span>`;
+
+}
+
+let actions="";
+
+if(
+(
+currentRole==="leader"||
+currentRole==="teacher"
+) &&
+r.status==="waiting"
+){
+
+actions=`
+
+<button
+class="action-btn btn-approve"
+onclick="handleRequest('${r.id}','approve')">
+
+✓ อนุมัติ
+
+</button>
+
+<button
+class="action-btn btn-reject"
+onclick="handleRequest('${r.id}','reject')">
+
+✗ ปฏิเสธ
+
+</button>
+
+`;
+
+}
+
+return `
+
+<tr>
+
+<td>
+${r.studentName}
+</td>
+
+<td>
+${r.dutyDate}
+</td>
+
+<td>
+${r.reason}
+</td>
+
+<td>
+${status}
+</td>
+
+<td>
+${actions}
+</td>
+
+</tr>
+
+`;
+
+}
+)
+.join("");
+
+}
+
+
+/* ================= STUDENTS ================= */
+
+function renderStudents(){
+
+const table=
+document.getElementById(
+"studentTable"
+);
+
+if(!table){
+
+return;
+
+}
+
+if(students.length===0){
+
+table.innerHTML=
+`
+<tr>
+
+<td colspan="5">
+
+<div class="empty">
+ยังไม่มีนักเรียน
+</div>
+
+</td>
+
+</tr>
+`;
+
+return;
+
+}
+
+table.innerHTML=
+students
+.map(
+s=>{
+
+const score=
+typeof s.score==="number"
+?s.score
+:100;
+
+const doneCount=
+duties.filter(
+d=>
+String(d.studentId)===
+String(s.id) &&
+d.status==="done"
+).length;
+
+const notDoneCount=
+duties.filter(
+d=>
+String(d.studentId)===
+String(s.id) &&
+d.status==="notdone"
+).length;
+
+return `
+
+<tr>
+
+<td>
+${s.id}
+</td>
+
+<td>
+${s.name}
+</td>
+
+<td>
+
+<b style="
+color:#2563eb;
+font-size:18px;
+">
+
+⭐ ${score}
+
+</b>
+
+</td>
+
+<td>
+✓ ${doneCount}
+</td>
+
+<td>
+✗ ${notDoneCount}
+</td>
+
+</tr>
+
+`;
+
+}
+)
+.join("");
+
+}
+
+
+/* ================= HISTORY ================= */
+
+function renderHistory(){
+
+const table=
+document.getElementById(
+"historyTable"
+);
+
+if(!table){
+
+return;
+
+}
+
+if(histories.length===0){
+
+table.innerHTML=
+`
+<tr>
+
+<td colspan="2">
+
+<div class="empty">
+ยังไม่มีประวัติ
+</div>
+
+</td>
+
+</tr>
+`;
+
+return;
+
+}
+
+const sorted=
+[...histories]
+.sort(
+(a,b)=>
+String(b.time)
+.localeCompare(
+String(a.time)
+)
+);
+
+table.innerHTML=
+sorted.map(
+h=>{
+
+let time=h.time||"";
+
+try{
+
+time=
+new Date(h.time)
+.toLocaleString(
+"th-TH"
+);
+
+}catch(e){}
+
+return `
+
+<tr>
+
+<td>
+${time}
+</td>
+
+<td>
+${h.message||"-"}
+</td>
+
+</tr>
+
+`;
+
+}
+)
+.join("");
+
+}
+
+
+/* ================= GLOBAL FUNCTIONS ================= */
+
+window.selectRole=
+selectRole;
+
+window.login=
+login;
+
+window.logout=
+logout;
+
+window.showPage=
+showPage;
+
+window.markDone=
+markDone;
+
+window.markNotDone=
+markNotDone;
+
+window.sendLeave=
+sendLeave;
+
+window.handleRequest=
+handleRequest;
+
+
+/* ================= START ================= */
+
+initializeSystem();
+
+</script>
+
+</body>
+</html>
