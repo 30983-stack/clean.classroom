@@ -2,8 +2,8 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ระบบจัดเวรนักเรียน</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Student Duty Management</title>
 
 <style>
 *{
@@ -41,7 +41,7 @@ button{
 .login-box{
   width:100%;
   max-width:430px;
-  background:white;
+  background:#fff;
   padding:30px;
   border-radius:24px;
   box-shadow:0 20px 60px rgba(0,0,0,.25);
@@ -113,13 +113,9 @@ button{
   padding:15px;
   border-radius:12px;
   background:#2563eb;
-  color:white;
+  color:#fff;
   font-size:17px;
   font-weight:bold;
-}
-
-.login-btn:hover{
-  background:#1d4ed8;
 }
 
 .demo-box{
@@ -137,19 +133,19 @@ button{
   font-size:13px;
 }
 
-/* ================= HEADER ================= */
+/* ================= APP ================= */
 
 .header{
   height:70px;
   background:#1e293b;
-  color:white;
+  color:#fff;
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:0 25px;
   position:sticky;
   top:0;
-  z-index:10;
+  z-index:20;
 }
 
 .header-title{
@@ -167,11 +163,9 @@ button{
   padding:9px 15px;
   border-radius:10px;
   background:#ef4444;
-  color:white;
+  color:#fff;
   font-weight:bold;
 }
-
-/* ================= LAYOUT ================= */
 
 .layout{
   display:flex;
@@ -180,7 +174,7 @@ button{
 
 .sidebar{
   width:240px;
-  background:white;
+  background:#fff;
   border-right:1px solid #e2e8f0;
   padding:20px 12px;
 }
@@ -191,7 +185,7 @@ button{
   padding:13px 15px;
   margin-bottom:7px;
   border-radius:12px;
-  background:white;
+  background:#fff;
   color:#334155;
   font-size:15px;
   font-weight:bold;
@@ -203,7 +197,7 @@ button{
 
 .menu-btn.active{
   background:#2563eb;
-  color:white;
+  color:#fff;
 }
 
 .content{
@@ -241,7 +235,7 @@ button{
 }
 
 .card{
-  background:white;
+  background:#fff;
   border-radius:18px;
   padding:20px;
   box-shadow:0 4px 15px rgba(15,23,42,.06);
@@ -265,7 +259,7 @@ button{
 /* ================= TABLE ================= */
 
 .table-box{
-  background:white;
+  background:#fff;
   border-radius:18px;
   padding:20px;
   overflow:auto;
@@ -322,7 +316,7 @@ td{
 .action-btn{
   padding:8px 12px;
   border-radius:9px;
-  color:white;
+  color:#fff;
   font-weight:bold;
   margin:2px;
 }
@@ -351,7 +345,7 @@ td{
 }
 
 .rank-item{
-  background:white;
+  background:#fff;
   border-radius:16px;
   padding:17px;
   display:flex;
@@ -363,6 +357,7 @@ td{
 .rank-number{
   width:45px;
   height:45px;
+  min-width:45px;
   border-radius:50%;
   display:flex;
   align-items:center;
@@ -380,6 +375,12 @@ td{
   font-weight:bold;
 }
 
+.rank-detail{
+  color:#64748b;
+  font-size:13px;
+  margin-top:4px;
+}
+
 .rank-score{
   font-size:20px;
   font-weight:bold;
@@ -395,6 +396,12 @@ td{
   background:#eff6ff;
   border:1px solid #bfdbfe;
   color:#1e40af;
+}
+
+.empty{
+  text-align:center;
+  padding:30px;
+  color:#64748b;
 }
 
 /* ================= MOBILE ================= */
@@ -470,554 +477,850 @@ td{
 
 <body>
 
-<!-- =====================================================
-     LOGIN
-     ไม่มีระบบลงทะเบียน
-===================================================== -->
+<!-- ================= LOGIN ================= -->
 
 <div id="loginPage">
 
-  <div class="login-box">
+<div class="login-box">
 
-    <div class="login-logo">🏫</div>
+<div class="login-logo">🏫</div>
 
-    <div class="login-title">
-      Student Duty
-    </div>
+<div class="login-title">
+Student Duty
+</div>
 
-    <div class="login-subtitle">
-      ระบบจัดเวรและหัวหน้าเวรเช็ค
-    </div>
+<div class="login-subtitle">
+ระบบจัดเวรและหัวหน้าเวรเช็ค
+</div>
 
-    <div class="role-buttons">
+<div class="role-buttons">
 
-      <button
-        id="studentRole"
-        class="role-btn active"
-        onclick="selectRole('student')">
-        👨‍🎓<br>นักเรียน
-      </button>
+<button id="studentRole"
+class="role-btn active"
+onclick="selectRole('student')">
+👨‍🎓<br>นักเรียน
+</button>
 
-      <button
-        id="leaderRole"
-        class="role-btn"
-        onclick="selectRole('leader')">
-        👑<br>หัวหน้าเวร
-      </button>
+<button id="leaderRole"
+class="role-btn"
+onclick="selectRole('leader')">
+👑<br>หัวหน้าเวร
+</button>
 
-      <button
-        id="teacherRole"
-        class="role-btn"
-        onclick="selectRole('teacher')">
-        👨‍🏫<br>ครู
-      </button>
-
-    </div>
-
-    <div class="input-group">
-
-      <label id="usernameLabel">
-        รหัสนักเรียน
-      </label>
-
-      <input
-        id="username"
-        type="text"
-        placeholder="เช่น 65001">
-
-    </div>
-
-    <div class="input-group">
-
-      <label>
-        รหัสผ่าน
-      </label>
-
-      <input
-        id="password"
-        type="password"
-        placeholder="กรอกรหัสผ่าน">
-
-    </div>
-
-    <button
-      class="login-btn"
-      onclick="login()">
-      🔐 เข้าสู่ระบบ
-    </button>
-
-    <!-- ไม่มีปุ่มสมัครสมาชิก -->
-
-    <div class="demo-box">
-
-      <b>บัญชีสำหรับทดสอบ</b><br>
-
-      👨‍🎓 นักเรียน:
-      65001 / 1234<br>
-
-      👑 หัวหน้าเวร:
-      leader / 1234<br>
-
-      👨‍🏫 ครู:
-      teacher / 1234
-
-    </div>
-
-    <div
-      id="firebaseStatus"
-      class="firebase-status">
-      🔄 กำลังเชื่อมต่อ Firebase...
-    </div>
-
-  </div>
+<button id="teacherRole"
+class="role-btn"
+onclick="selectRole('teacher')">
+👨‍🏫<br>ครู
+</button>
 
 </div>
 
+<div class="input-group">
 
-<!-- =====================================================
-     APP
-===================================================== -->
+<label id="usernameLabel">
+รหัสนักเรียน
+</label>
+
+<input
+id="username"
+type="text"
+placeholder="เช่น 65001">
+
+</div>
+
+<div class="input-group">
+
+<label>
+รหัสผ่าน
+</label>
+
+<input
+id="password"
+type="password"
+placeholder="กรอกรหัสผ่าน">
+
+</div>
+
+<button
+class="login-btn"
+onclick="login()">
+🔐 เข้าสู่ระบบ
+</button>
+
+<div class="demo-box">
+
+<b>บัญชีสำหรับทดสอบ</b><br>
+
+👨‍🎓 นักเรียน:
+65001 / 1234<br>
+
+👑 หัวหน้าเวร:
+leader / 1234<br>
+
+👨‍🏫 ครู:
+teacher / 1234
+
+</div>
+
+<div
+id="firebaseStatus"
+class="firebase-status">
+🔄 กำลังเชื่อมต่อ Firebase...
+</div>
+
+</div>
+</div>
+
+
+<!-- ================= APP ================= -->
 
 <div id="appPage" class="hidden">
 
-  <div class="header">
-
-    <div class="header-title">
-      🏫 Student Duty Management
-    </div>
-
-    <div class="header-user">
-
-      <span id="currentUserName">
-        ผู้ใช้งาน
-      </span>
-
-      <button
-        class="logout-btn"
-        onclick="logout()">
-        ออกจากระบบ
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <div class="layout">
-
-    <div class="sidebar">
-
-      <button
-        class="menu-btn active"
-        onclick="showPage('dashboard',this)">
-        🏠 หน้าหลัก
-      </button>
-
-      <button
-        class="menu-btn"
-        onclick="showPage('duty',this)">
-        📅 ตารางเวร
-      </button>
-
-      <button
-        class="menu-btn"
-        onclick="showPage('leaderboard',this)">
-        🏆 Leaderboard
-      </button>
-
-      <button
-        class="menu-btn"
-        onclick="showPage('requests',this)">
-        📝 คำขอหยุดเวร
-      </button>
-
-      <button
-        class="menu-btn"
-        onclick="showPage('students',this)">
-        👥 นักเรียน
-      </button>
-
-      <button
-        class="menu-btn"
-        onclick="showPage('history',this)">
-        📜 ประวัติ
-      </button>
-
-    </div>
-
-
-    <div class="content">
-
-      <!-- DASHBOARD -->
-
-      <div
-        id="dashboard"
-        class="page active">
-
-        <div class="page-title">
-          Dashboard
-        </div>
-
-        <div class="page-subtitle">
-          ภาพรวมระบบจัดเวรนักเรียน
-        </div>
-
-        <div
-          id="dashboardCards"
-          class="cards">
-        </div>
-
-        <div class="notice">
-
-          ⭐ <b>ระบบหักคะแนนอัตโนมัติ</b><br>
-
-          หากหัวหน้าเวรหรือครูกด
-          <b>❌ ไม่ทำเวร</b>
-          ระบบจะหักคะแนนนักเรียน
-          <b>1 คะแนนอัตโนมัติ</b>
-
-          <br>
-
-          🛡️ เวรเดิมจะไม่ถูกหักคะแนนซ้ำ
-
-        </div>
-
-        <div class="table-box">
-
-          <h3 style="margin-bottom:15px">
-            📅 เวรวันนี้
-          </h3>
-
-          <div id="todayDuty">
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- DUTY -->
-
-      <div
-        id="duty"
-        class="page">
-
-        <div class="page-title">
-          📅 ตารางเวร
-        </div>
-
-        <div class="page-subtitle">
-          ตรวจสอบและจัดการเวรนักเรียน
-        </div>
-
-        <div class="table-box">
-
-          <table>
-
-            <thead>
-
-              <tr>
-                <th>วันที่</th>
-                <th>นักเรียน</th>
-                <th>สถานะ</th>
-                <th>เหตุผล</th>
-                <th>การจัดการ</th>
-              </tr>
-
-            </thead>
-
-            <tbody id="dutyTable">
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-
-      <!-- LEADERBOARD -->
-
-      <div
-        id="leaderboard"
-        class="page">
-
-        <div class="page-title">
-          🏆 Leaderboard
-        </div>
-
-        <div class="page-subtitle">
-          สถิติการทำเวรและคะแนน
-        </div>
-
-        <div
-          id="leaderboardList"
-          class="leaderboard">
-        </div>
-
-      </div>
-
-
-      <!-- REQUESTS -->
-
-      <div
-        id="requests"
-        class="page">
-
-        <div class="page-title">
-          📝 คำขอหยุดเวร
-        </div>
-
-        <div class="page-subtitle">
-          ตรวจสอบคำขอหยุดเวรของนักเรียน
-        </div>
-
-        <div class="table-box">
-
-          <table>
-
-            <thead>
-
-              <tr>
-                <th>นักเรียน</th>
-                <th>วันที่</th>
-                <th>เหตุผล</th>
-                <th>สถานะ</th>
-                <th>จัดการ</th>
-              </tr>
-
-            </thead>
-
-            <tbody id="requestTable">
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-
-      <!-- STUDENTS -->
-
-      <div
-        id="students"
-        class="page">
-
-        <div class="page-title">
-          👥 นักเรียน
-        </div>
-
-        <div class="page-subtitle">
-          คะแนนและสถิติการทำเวร
-        </div>
-
-        <div class="table-box">
-
-          <table>
-
-            <thead>
-
-              <tr>
-                <th>รหัส</th>
-                <th>ชื่อ</th>
-                <th>คะแนน</th>
-                <th>ทำเวร</th>
-                <th>ไม่ทำเวร</th>
-              </tr>
-
-            </thead>
-
-            <tbody id="studentTable">
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-
-      <!-- HISTORY -->
-
-      <div
-        id="history"
-        class="page">
-
-        <div class="page-title">
-          📜 ประวัติ
-        </div>
-
-        <div class="page-subtitle">
-          ประวัติการตรวจเวรและการหักคะแนน
-        </div>
-
-        <div class="table-box">
-
-          <table>
-
-            <thead>
-
-              <tr>
-                <th>เวลา</th>
-                <th>รายการ</th>
-              </tr>
-
-            </thead>
-
-            <tbody id="historyTable">
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
+<div class="header">
+
+<div class="header-title">
+🏫 Student Duty Management
+</div>
+
+<div class="header-user">
+
+<span id="currentUserName">
+ผู้ใช้งาน
+</span>
+
+<button
+class="logout-btn"
+onclick="logout()">
+ออกจากระบบ
+</button>
+
+</div>
+</div>
+
+
+<div class="layout">
+
+<div class="sidebar">
+
+<button
+class="menu-btn active"
+onclick="showPage('dashboard',this)">
+🏠 หน้าหลัก
+</button>
+
+<button
+class="menu-btn"
+onclick="showPage('duty',this)">
+📅 ตารางเวร
+</button>
+
+<button
+class="menu-btn"
+onclick="showPage('leaderboard',this)">
+🏆 Leaderboard
+</button>
+
+<button
+class="menu-btn"
+onclick="showPage('requests',this)">
+📝 คำขอหยุดเวร
+</button>
+
+<button
+class="menu-btn"
+onclick="showPage('students',this)">
+👥 นักเรียน
+</button>
+
+<button
+class="menu-btn"
+onclick="showPage('history',this)">
+📜 ประวัติ
+</button>
 
 </div>
 
 
-<!-- =====================================================
-     FIREBASE
-===================================================== -->
+<div class="content">
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="page active">
+
+<div class="page-title">
+Dashboard
+</div>
+
+<div class="page-subtitle">
+ภาพรวมระบบจัดเวรนักเรียน
+</div>
+
+<div id="dashboardCards" class="cards"></div>
+
+<div class="notice">
+
+⭐ <b>ระบบหักคะแนนอัตโนมัติ</b><br>
+
+หากหัวหน้าเวรหรือครูกด
+<b>❌ ไม่ทำเวร</b>
+ระบบจะหักคะแนนนักเรียน
+<b>1 คะแนนอัตโนมัติ</b>
+
+<br><br>
+
+🛡️ เวรเดิมจะไม่ถูกหักคะแนนซ้ำ
+
+<br>
+
+📝 หากอนุมัติการลา จะไม่หักคะแนน
+
+</div>
+
+<div class="table-box">
+
+<h3 style="margin-bottom:15px">
+📅 เวรวันนี้
+</h3>
+
+<div id="todayDuty"></div>
+
+</div>
+
+</div>
+
+
+<!-- DUTY -->
+
+<div id="duty" class="page">
+
+<div class="page-title">
+📅 ตารางเวร
+</div>
+
+<div class="page-subtitle">
+ตรวจสอบและจัดการเวรนักเรียน
+</div>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+
+<tr>
+<th>วันที่</th>
+<th>นักเรียน</th>
+<th>สถานะ</th>
+<th>เหตุผล</th>
+<th>การจัดการ</th>
+</tr>
+
+</thead>
+
+<tbody id="dutyTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- LEADERBOARD -->
+
+<div id="leaderboard" class="page">
+
+<div class="page-title">
+🏆 Leaderboard
+</div>
+
+<div class="page-subtitle">
+สถิติการทำเวรของนักเรียน
+</div>
+
+<div
+id="leaderboardList"
+class="leaderboard">
+</div>
+
+</div>
+
+
+<!-- REQUESTS -->
+
+<div id="requests" class="page">
+
+<div class="page-title">
+📝 คำขอหยุดเวร
+</div>
+
+<div class="page-subtitle">
+ตรวจสอบคำขอหยุดเวรของนักเรียน
+</div>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+
+<tr>
+<th>นักเรียน</th>
+<th>วันที่</th>
+<th>เหตุผล</th>
+<th>สถานะ</th>
+<th>จัดการ</th>
+</tr>
+
+</thead>
+
+<tbody id="requestTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- STUDENTS -->
+
+<div id="students" class="page">
+
+<div class="page-title">
+👥 นักเรียน
+</div>
+
+<div class="page-subtitle">
+คะแนนและสถิติการทำเวร
+</div>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+
+<tr>
+<th>รหัส</th>
+<th>ชื่อ</th>
+<th>คะแนน</th>
+<th>ทำเวร</th>
+<th>ไม่ทำเวร</th>
+</tr>
+
+</thead>
+
+<tbody id="studentTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- HISTORY -->
+
+<div id="history" class="page">
+
+<div class="page-title">
+📜 ประวัติ
+</div>
+
+<div class="page-subtitle">
+ประวัติการตรวจเวรและการหักคะแนน
+</div>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+
+<tr>
+<th>เวลา</th>
+<th>รายการ</th>
+</tr>
+
+</thead>
+
+<tbody id="historyTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+</div>
+
+
+<!-- ================= FIREBASE ================= -->
 
 <script type="module">
 
 import {
-  initializeApp
+initializeApp
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
 import {
-  getFirestore,
-  collection,
-  doc,
-  getDocs,
-  setDoc,
-  updateDoc,
-  addDoc,
-  onSnapshot
+getFirestore,
+collection,
+doc,
+getDocs,
+setDoc,
+updateDoc,
+addDoc,
+onSnapshot,
+runTransaction
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
-/* ================= FIREBASE CONFIG ================= */
+/* ================= CONFIG ================= */
 
 const firebaseConfig = {
 
-  apiKey:
-    "AIzaSyD_ybe7jAxkTee9b3T9lYRLJGF-hTr-FY",
+apiKey:
+"AIzaSyD_ybe7jAxKtee9b3T9lYRLJGF-hTr-FY",
 
-  authDomain:
-    "student-duty-feb7e.firebaseapp.com",
+authDomain:
+"student-duty-feb7e.firebaseapp.com",
 
-  projectId:
-    "student-duty-feb7e",
+projectId:
+"student-duty-feb7e",
 
-  storageBucket:
-    "student-duty-feb7e.firebasestorage.app",
+storageBucket:
+"student-duty-feb7e.firebasestorage.app",
 
-  messagingSenderId:
-    "624965373640",
+messagingSenderId:
+"624965373640",
 
-  appId:
-    "1:624965373640:web:ab1f9b2bc318c4e18f9ffd",
+appId:
+"1:624965373640:web:ab1f9b2bc318c4e18f9ffd",
 
-  measurementId:
-    "G-JNWM68ZCZ6"
+measurementId:
+"G-JNWM68ZCZ6"
 
 };
 
 
-const app =
-  initializeApp(firebaseConfig);
+/* ================= FIREBASE START ================= */
 
-const db =
-  getFirestore(app);
+let app;
+let db;
+
+try{
+
+app=initializeApp(firebaseConfig);
+
+db=getFirestore(app);
+
+}catch(error){
+
+console.error(error);
+
+document.getElementById("firebaseStatus").innerHTML=
+"🔴 Firebase ตั้งค่าไม่สำเร็จ";
+
+}
 
 
 /* ================= VARIABLES ================= */
 
-let currentRole = "student";
-let currentUser = null;
+let currentRole="student";
+let currentUser=null;
 
-let students = [];
-let duties = [];
-let requests = [];
-let histories = [];
+let students=[];
+let duties=[];
+let requests=[];
+let histories=[];
 
 
 /* ================= ROLE ================= */
 
 function selectRole(role){
 
-  currentRole = role;
+currentRole=role;
 
-  document
-    .querySelectorAll(".role-btn")
-    .forEach(
-      btn =>
-        btn.classList.remove("active")
-    );
-
-
-  if(role === "student"){
-
-    document
-      .getElementById("studentRole")
-      .classList.add("active");
-
-    document
-      .getElementById("usernameLabel")
-      .textContent =
-      "รหัสนักเรียน";
-
-    document
-      .getElementById("username")
-      .placeholder =
-      "เช่น 65001";
-
-  }
+document
+.querySelectorAll(".role-btn")
+.forEach(btn=>{
+btn.classList.remove("active");
+});
 
 
-  if(role === "leader"){
+if(role==="student"){
 
-    document
-      .getElementById("leaderRole")
-      .classList.add("active");
+document
+.getElementById("studentRole")
+.classList.add("active");
 
-    document
-      .getElementById("usernameLabel")
-      .textContent =
-      "ชื่อผู้ใช้";
+document
+.getElementById("usernameLabel")
+.textContent="รหัสนักเรียน";
 
-    document
-      .getElementById("username")
-      .placeholder =
-      "leader";
+document
+.getElementById("username")
+.placeholder="เช่น 65001";
 
-  }
+}
+
+if(role==="leader"){
+
+document
+.getElementById("leaderRole")
+.classList.add("active");
+
+document
+.getElementById("usernameLabel")
+.textContent="ชื่อผู้ใช้";
+
+document
+.getElementById("username")
+.placeholder="leader";
+
+}
+
+if(role==="teacher"){
+
+document
+.getElementById("teacherRole")
+.classList.add("active");
+
+document
+.getElementById("usernameLabel")
+.textContent="ชื่อผู้ใช้";
+
+document
+.getElementById("username")
+.placeholder="teacher";
+
+}
+
+}
 
 
-  if(role === "teacher"){
+/* ================= SEED STUDENTS ================= */
 
-    document
-      .getElementById("teacherRole")
-      .classList.add("active");
+async function seedStudents(){
 
-    document
-      .getElementById("usernameLabel")
-      .textContent =
-      "ชื่อผู้ใช้";
+const snap=
+await getDocs(
+collection(db,"students")
+);
 
-    document
-      .getElementById("username")
-      .placeholder =
-      "teacher";
+if(snap.empty){
 
-  }
+await setDoc(
+doc(db,"students","65001"),
+{
+id:"65001",
+name:"รัชชานนท์",
+password:"1234",
+score:100,
+createdAt:new Date().toISOString()
+}
+);
+
+return;
+
+}
+
+
+/* เพิ่มคะแนนให้ข้อมูลเก่าที่ไม่มี score */
+
+for(const item of snap.docs){
+
+const data=item.data();
+
+if(typeof data.score!=="number"){
+
+await updateDoc(
+doc(db,"students",item.id),
+{
+score:100
+}
+);
+
+}
+
+}
+
+}
+
+
+/* ================= SEED DUTIES ================= */
+
+async function seedDuties(){
+
+const snap=
+await getDocs(
+collection(db,"duties")
+);
+
+if(!snap.empty){
+
+return;
+
+}
+
+const studentSnap=
+await getDocs(
+collection(db,"students")
+);
+
+const list=
+studentSnap.docs.map(
+d=>({
+...d.data(),
+docId:d.id
+})
+);
+
+if(list.length===0){
+
+return;
+
+}
+
+
+const today=new Date();
+
+
+for(let i=0;i<30;i++){
+
+const date=
+new Date(today);
+
+date.setDate(
+today.getDate()+i
+);
+
+const dateText=
+date.toISOString().split("T")[0];
+
+const student=
+list[i%list.length];
+
+const dutyRef=
+doc(
+collection(db,"duties")
+);
+
+await setDoc(
+dutyRef,
+{
+dutyDate:dateText,
+studentId:student.id,
+studentName:student.name,
+status:"waiting",
+reason:"",
+approved:false,
+scoreDeducted:false,
+createdAt:new Date().toISOString()
+}
+);
+
+}
+
+}
+
+
+/* ================= LOAD DATA ================= */
+
+async function loadData(){
+
+if(!db){
+
+throw new Error(
+"Firebase ยังไม่พร้อมใช้งาน"
+);
+
+}
+
+const studentSnap=
+await getDocs(
+collection(db,"students")
+);
+
+students=
+studentSnap.docs.map(
+d=>({
+...d.data(),
+docId:d.id
+})
+);
+
+
+const dutySnap=
+await getDocs(
+collection(db,"duties")
+);
+
+duties=
+dutySnap.docs.map(
+d=>({
+...d.data(),
+id:d.id
+})
+);
+
+
+const requestSnap=
+await getDocs(
+collection(db,"requests")
+);
+
+requests=
+requestSnap.docs.map(
+d=>({
+...d.data(),
+id:d.id
+})
+);
+
+
+const historySnap=
+await getDocs(
+collection(db,"history")
+);
+
+histories=
+historySnap.docs.map(
+d=>({
+...d.data(),
+id:d.id
+})
+);
+
+}
+
+
+/* ================= REALTIME ================= */
+
+function startListeners(){
+
+onSnapshot(
+collection(db,"students"),
+snap=>{
+
+students=
+snap.docs.map(
+d=>({
+...d.data(),
+docId:d.id
+})
+);
+
+renderAll();
+
+}
+);
+
+
+onSnapshot(
+collection(db,"duties"),
+snap=>{
+
+duties=
+snap.docs.map(
+d=>({
+...d.data(),
+id:d.id
+})
+);
+
+renderAll();
+
+}
+);
+
+
+onSnapshot(
+collection(db,"requests"),
+snap=>{
+
+requests=
+snap.docs.map(
+d=>({
+...d.data(),
+id:d.id
+})
+);
+
+renderAll();
+
+}
+);
+
+
+onSnapshot(
+collection(db,"history"),
+snap=>{
+
+histories=
+snap.docs.map(
+d=>({
+...d.data(),
+id:d.id
+})
+);
+
+renderAll();
+
+}
+);
+
+}
+
+
+/* ================= INITIALIZE ================= */
+
+async function initializeSystem(){
+
+try{
+
+if(!db){
+
+throw new Error(
+"ไม่สามารถเชื่อมต่อ Firebase"
+);
+
+}
+
+await seedStudents();
+
+await seedDuties();
+
+await loadData();
+
+startListeners();
+
+document
+.getElementById("firebaseStatus")
+.innerHTML=
+"🟢 Firebase เชื่อมต่อแล้ว";
+
+renderAll();
+
+}catch(error){
+
+console.error(error);
+
+document
+.getElementById("firebaseStatus")
+.innerHTML=
+"🔴 Firebase เชื่อมต่อไม่สำเร็จ";
+
+console.error(
+"Firebase Error:",
+error.message
+);
+
+}
 
 }
 
@@ -1026,150 +1329,140 @@ function selectRole(role){
 
 async function login(){
 
-  const username =
-    document
-      .getElementById("username")
-      .value
-      .trim();
+const username=
+document
+.getElementById("username")
+.value
+.trim();
 
-  const password =
-    document
-      .getElementById("password")
-      .value
-      .trim();
-
-
-  if(!username || !password){
-
-    alert("กรุณากรอกข้อมูลให้ครบ");
-
-    return;
-
-  }
+const password=
+document
+.getElementById("password")
+.value
+.trim();
 
 
-  try{
+if(!username||!password){
 
-    /* นักเรียน */
+alert(
+"กรุณากรอกข้อมูลให้ครบ"
+);
 
-    if(currentRole === "student"){
+return;
 
-      const snap =
-        await getDocs(
-          collection(db,"students")
-        );
-
-
-      const student =
-        snap.docs
-          .map(
-            d => ({
-              ...d.data(),
-              docId:d.id
-            })
-          )
-          .find(
-            s =>
-              String(s.id) === username &&
-              String(s.password) === password
-          );
+}
 
 
-      if(!student){
+try{
 
-        alert(
-          "รหัสนักเรียนหรือรหัสผ่านไม่ถูกต้อง"
-        );
+if(currentRole==="student"){
 
-        return;
+const snap=
+await getDocs(
+collection(db,"students")
+);
 
-      }
-
-
-      currentUser = student;
-
-    }
-
-
-    /* หัวหน้าเวร */
-
-    if(currentRole === "leader"){
-
-      if(
-        username !== "leader" ||
-        password !== "1234"
-      ){
-
-        alert(
-          "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"
-        );
-
-        return;
-
-      }
+const student=
+snap.docs
+.map(
+d=>({
+...d.data(),
+docId:d.id
+})
+)
+.find(
+s=>
+String(s.id)===username &&
+String(s.password)===password
+);
 
 
-      currentUser = {
-        id:"leader",
-        name:"หัวหน้าเวร"
-      };
+if(!student){
 
-    }
+alert(
+"รหัสนักเรียนหรือรหัสผ่านไม่ถูกต้อง"
+);
 
+return;
 
-    /* ครู */
+}
 
-    if(currentRole === "teacher"){
+currentUser=student;
 
-      if(
-        username !== "teacher" ||
-        password !== "1234"
-      ){
-
-        alert(
-          "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"
-        );
-
-        return;
-
-      }
+}
 
 
-      currentUser = {
-        id:"teacher",
-        name:"คุณครู"
-      };
+if(currentRole==="leader"){
 
-    }
+if(
+username!=="leader" ||
+password!=="1234"
+){
 
+alert(
+"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"
+);
 
-    document
-      .getElementById("loginPage")
-      .classList.add("hidden");
+return;
 
-    document
-      .getElementById("appPage")
-      .classList.remove("hidden");
+}
 
-    document
-      .getElementById("currentUserName")
-      .textContent =
-      currentUser.name;
+currentUser={
+id:"leader",
+name:"หัวหน้าเวร"
+};
 
-
-    renderAll();
+}
 
 
-  }catch(error){
+if(currentRole==="teacher"){
 
-    console.error(error);
+if(
+username!=="teacher" ||
+password!=="1234"
+){
 
-    alert(
-      "เข้าสู่ระบบไม่สำเร็จ\n\n" +
-      error.message
-    );
+alert(
+"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"
+);
 
-  }
+return;
+
+}
+
+currentUser={
+id:"teacher",
+name:"คุณครู"
+};
+
+}
+
+
+document
+.getElementById("loginPage")
+.classList.add("hidden");
+
+document
+.getElementById("appPage")
+.classList.remove("hidden");
+
+document
+.getElementById("currentUserName")
+.textContent=
+currentUser.name;
+
+renderAll();
+
+}catch(error){
+
+console.error(error);
+
+alert(
+"เข้าสู่ระบบไม่สำเร็จ\n\n"+
+error.message
+);
+
+}
 
 }
 
@@ -1178,23 +1471,23 @@ async function login(){
 
 function logout(){
 
-  currentUser = null;
+currentUser=null;
 
-  document
-    .getElementById("appPage")
-    .classList.add("hidden");
+document
+.getElementById("appPage")
+.classList.add("hidden");
 
-  document
-    .getElementById("loginPage")
-    .classList.remove("hidden");
+document
+.getElementById("loginPage")
+.classList.remove("hidden");
 
-  document
-    .getElementById("username")
-    .value = "";
+document
+.getElementById("username")
+.value="";
 
-  document
-    .getElementById("password")
-    .value = "";
+document
+.getElementById("password")
+.value="";
 
 }
 
@@ -1203,36 +1496,35 @@ function logout(){
 
 function showPage(pageId,button){
 
-  document
-    .querySelectorAll(".page")
-    .forEach(
-      page =>
-        page.classList.remove("active")
-    );
+document
+.querySelectorAll(".page")
+.forEach(
+p=>p.classList.remove("active")
+);
+
+const page=
+document.getElementById(pageId);
+
+if(page){
+
+page.classList.add("active");
+
+}
 
 
-  const page =
-    document.getElementById(pageId);
+document
+.querySelectorAll(".menu-btn")
+.forEach(
+b=>b.classList.remove("active")
+);
 
-  if(page){
-    page.classList.add("active");
-  }
+if(button){
 
+button.classList.add("active");
 
-  document
-    .querySelectorAll(".menu-btn")
-    .forEach(
-      b =>
-        b.classList.remove("active")
-    );
+}
 
-
-  if(button){
-    button.classList.add("active");
-  }
-
-
-  renderAll();
+renderAll();
 
 }
 
@@ -1241,113 +1533,111 @@ function showPage(pageId,button){
 
 function statusText(status){
 
-  if(status === "done"){
+if(status==="done"){
 
-    return `
-      <span class="status status-done">
-        ✓ ทำแล้ว
-      </span>
-    `;
+return `
+<span class="status status-done">
+✓ ทำแล้ว
+</span>
+`;
 
-  }
+}
 
+if(status==="notdone"){
 
-  if(status === "notdone"){
+return `
+<span class="status status-notdone">
+✗ ไม่ทำ
+</span>
+`;
 
-    return `
-      <span class="status status-notdone">
-        ✗ ไม่ทำ
-      </span>
-    `;
+}
 
-  }
+if(status==="leave"){
 
+return `
+<span class="status status-leave">
+📝 ลา
+</span>
+`;
 
-  if(status === "leave"){
+}
 
-    return `
-      <span class="status status-leave">
-        📝 ลา
-      </span>
-    `;
-
-  }
-
-
-  return `
-    <span class="status status-waiting">
-      ⏳ รอตรวจ
-    </span>
-  `;
+return `
+<span class="status status-waiting">
+⏳ รอตรวจ
+</span>
+`;
 
 }
 
 
-/* ================= ACTION BUTTON ================= */
+/* ================= ACTION ================= */
 
 function actionButtons(d){
 
-  if(!currentUser){
-    return "";
-  }
+if(!currentUser){
+
+return "";
+
+}
 
 
-  /* นักเรียน */
+/* STUDENT */
 
-  if(currentRole === "student"){
+if(currentRole==="student"){
 
-    if(
-      String(d.studentId) ===
-      String(currentUser.id) &&
-      d.status === "waiting"
-    ){
+if(
+String(d.studentId)===
+String(currentUser.id) &&
+d.status==="waiting"
+){
 
-      return `
-        <button
-          class="action-btn btn-approve"
-          onclick="sendLeave('${d.id}')">
-          📝 ขอหยุดเวร
-        </button>
-      `;
+return `
+<button
+class="action-btn btn-approve"
+onclick="sendLeave('${d.id}')">
+📝 ขอหยุดเวร
+</button>
+`;
 
-    }
+}
 
-    return "";
+return "";
 
-  }
-
-
-  /* หัวหน้าเวร / ครู */
-
-  if(
-    currentRole === "leader" ||
-    currentRole === "teacher"
-  ){
-
-    if(d.status === "waiting"){
-
-      return `
-
-        <button
-          class="action-btn btn-done"
-          onclick="markDone('${d.id}')">
-          ✓ ทำแล้ว
-        </button>
-
-        <button
-          class="action-btn btn-notdone"
-          onclick="markNotDone('${d.id}')">
-          ✗ ไม่ทำ
-        </button>
-
-      `;
-
-    }
-
-  }
+}
 
 
-  return "";
+/* LEADER / TEACHER */
+
+if(
+currentRole==="leader"||
+currentRole==="teacher"
+){
+
+if(d.status==="waiting"){
+
+return `
+
+<button
+class="action-btn btn-done"
+onclick="markDone('${d.id}')">
+✓ ทำแล้ว
+</button>
+
+<button
+class="action-btn btn-notdone"
+onclick="markNotDone('${d.id}')">
+✗ ไม่ทำ
+</button>
+
+`;
+
+}
+
+}
+
+return "";
 
 }
 
@@ -1356,42 +1646,98 @@ function actionButtons(d){
 
 async function markDone(id){
 
-  const duty =
-    duties.find(
-      d => d.id === id
-    );
+const duty=
+duties.find(
+d=>d.id===id
+);
+
+if(!duty){
+
+alert("ไม่พบข้อมูลเวร");
+
+return;
+
+}
+
+if(duty.status!=="waiting"){
+
+alert("เวรนี้ถูกตรวจแล้ว");
+
+return;
+
+}
+
+try{
+
+await updateDoc(
+doc(db,"duties",id),
+{
+status:"done",
+approved:true,
+checkedBy:currentUser.name,
+checkedAt:new Date().toISOString()
+}
+);
+
+await addDoc(
+collection(db,"history"),
+{
+time:new Date().toISOString(),
+message:
+`✓ ${duty.studentName} ทำเวรวันที่ ${duty.dutyDate} แล้ว โดย ${currentUser.name}`,
+type:"done"
+}
+);
+
+alert("บันทึกว่าทำเวรแล้ว");
+
+}catch(error){
+
+console.error(error);
+
+alert(
+"บันทึกไม่สำเร็จ\n"+
+error.message
+);
+
+}
+
+}
 
 
-  if(!duty){
+/* ================= MARK NOT DONE ================= */
 
-    alert("ไม่พบข้อมูลเวร");
+async function markNotDone(id){
 
-    return;
+const duty=
+duties.find(
+d=>d.id===id
+);
 
-  }
+if(!duty){
 
+alert("ไม่พบข้อมูลเวร");
 
-  if(duty.status === "done"){
+return;
 
-    alert("เวรนี้ตรวจแล้ว");
+}
 
-    return;
+if(duty.status!=="waiting"){
 
-  }
+alert("เวรนี้ถูกตรวจแล้ว");
 
+return;
 
-  if(duty.status === "notdone"){
+}
 
-    alert(
-      "เวรนี้ถูกหักคะแนนไปแล้ว"
-    );
+if(duty.approved){
 
-    return;
+alert(
+"เวรนี้ได้รับการอนุมัติแล้ว"
+);
 
-  }
+return;
 
+}
 
-  if(duty.status === "leave"){
-
-    alert(
- 
+const
